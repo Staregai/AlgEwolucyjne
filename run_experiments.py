@@ -23,6 +23,7 @@ for func_name, func in benchmark_functions.items():
             x0 = np.random.randn(dim)
             sigma = 0.5
             es = cma.CMAEvolutionStrategy(x0, sigma, {'seed': seed})
+
             result = es.optimize(func)
             best_f = result.result.fbest
 
