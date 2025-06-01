@@ -46,7 +46,6 @@ class cma_es:
         for _ in range(max_iter):
             pop, d_list = self.generate_pop()
 
-            # TODO () WYTESTUJ
             fitness = np.array([func(x) for x in pop])
             idx = np.argsort(fitness)
             best_idx = idx[:self.mu]
@@ -84,8 +83,7 @@ class cma_es:
 
     def update_path_c(self, delta):
         self.p_c = (1.0 - self.c_c) * self.p_c + np.sqrt(self.c_c * (2.0 - self.c_c) * float(self.mu)) * delta
-
-# TODO TEST() 
+ 
     def update_covariance(self, best_d):
         rank_one = self.c_1 * np.outer(self.p_c, self.p_c)
         rank_mu = self.c_mu * np.mean([np.outer(d, d) for d in best_d], axis=0)

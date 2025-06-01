@@ -1,6 +1,7 @@
 import unittest
 import numpy as np
 from optimazer.cma_es import cma_es
+from functions.benchmark import ackley
 
 # python -m unittest tests.cma_es_tests.py
 class cma_es_tests(unittest.TestCase):
@@ -92,8 +93,39 @@ class cma_es_tests(unittest.TestCase):
             p_c * (1.0 - optimizer.c_c)
             + np.sqrt(optimizer.c_c * (2.0 - optimizer.c_c) * 10.0) * delta
         )
-        
+
         np.testing.assert_array_almost_equal(optimizer.p_c, expected, decimal=6)
+
+    def test_update_covariance(self):
+        dim = 2
+        optimizer = cma_es(x0=np.zeros(dim), pop_size=10, mu=2)
+
+        optimizer.C = np.eye(dim)
+        
+        optimizer.c_1 = 0.2
+        optimizer.c_mu = 0.3
+        
+        optimizer.p_c = np.array([1.0, 2.0])
+        rank_one = optimizer.c_1 * np.outer(optimizer.p_c, optimizer.p_c)
+        
+        d1 = np.array([1.0, 0.0])
+        d2 = np.array([0.0, 2.0])
+        best_d = np.array([d1, d2])
+
+        rank_mu = optimizer.c_mu * np.mean([np.outer(d, d) for d in best_d], axis=0)
+        
+        expected_C = (1 - optimizer.c_1 - optimizer.c_mu) * optimizer.C + rank_one + rank_mu
+        
+        optimizer.update_covariance(best_d)
+        
+        np.testing.assert_array_almost_equal(optimizer.C, expected_C, decimal=6)
+
+
+    def test_cma_es_ackley(self):
+        dim = 2
+        optimizer = cma_es(x0=np.zeros(dim), pop_size=10, mu=2)
+        optimizer.optimize(ackley)
+        np.testing.assert_array_almost_equal(optimizer.m, 0, decimal=10)
 
 
 if __name__ == "__main__":
