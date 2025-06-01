@@ -1,6 +1,11 @@
 import unittest
 import numpy as np
-from optimazer.center_strategies import *
+from optimazer.center_strategies import (
+    ArithmeticMeanCenterStrategy,
+    MedianCenterStrategy,
+    WeightedMeanCenterStrategy,
+    TrimmedMeanCenterStrategy,
+)
 
 # python -m unittest tests.mean_starategies_tests
 class TestCenterStrategy(unittest.TestCase):
@@ -40,6 +45,8 @@ class TestCenterStrategy(unittest.TestCase):
         result = strategy.compute_center(vectors)
         expected = [1.5, 1.5]
         np.testing.assert_array_almost_equal(result, expected)
+
+    
 
 if __name__ == "__main__":
     unittest.main()
