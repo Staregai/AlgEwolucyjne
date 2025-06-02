@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 from optimazer.cma_es import cma_es
 from functions.benchmark import ackley
-
+import optimazer.center_strategies as mn
 # python -m unittest tests.cma_es_tests.py
 class cma_es_tests(unittest.TestCase):
 
@@ -127,6 +127,44 @@ class cma_es_tests(unittest.TestCase):
         optimizer.optimize(ackley)
         np.testing.assert_array_almost_equal(optimizer.m, 0, decimal=10)
 
+    def test_arithmetic_mean_center(self):
+        pop = np.array([[1, 2], [3, 4], [5, 6]])
+        cma = cma_es(x0=[0, 0], center_strategy=mn.ArithmeticMeanCenterStrategy())
+        center = cma.compute_new_center(pop)
+        assert np.allclose(center, np.mean(pop, axis=0))
 
+    def test_weighted_mean_center(self):
+        pop = np.array([[1, 2], [3, 4], [5, 6]])
+        weights = np.linspace(len(pop), 1, len(pop))
+        cma = cma_es(x0=[0, 0], center_strategy=mn.WeightedMeanCenterStrategy())
+        center = cma.compute_new_center(pop)
+        self.assertTrue(np.allclose(center, np.average(pop, axis=0, weights=weights)))
+        
+    def test_median_center(self):
+        pop = np.array([[1, 2], [3, 4], [5, 100]])
+        cma = cma_es(x0=[0, 0], center_strategy=mn.MedianCenterStrategy())
+        center = cma.compute_new_center(pop)
+        self.assertTrue(np.allclose(center, np.median(pop, axis=0)))
+
+    def test_trimmed_mean_center(self):
+        pop = np.array([
+        [1, 2],   
+        [3, 4],    
+        [5, 6],    
+        [7, 8],    
+        [9, 10],   
+        [11, 12],  
+        [13, 14],  
+        [15, 16],  
+        [17, 18],  
+        [100, 5]   
+    ])
+        cma = cma_es(x0=[0, 0], center_strategy=mn.TrimmedMeanCenterStrategy())
+        center = cma.compute_new_center(pop)
+        # sortujemy po sumie wartości w każdym wektorze
+        sorted_vectors = pop[np.argsort(np.sum(pop, axis=1))]
+        trimmed_vectors = sorted_vectors[1:-1]  # po jednym z każdej strony (k=1)
+        expected = np.mean(trimmed_vectors, axis=0)
+        self.assertTrue(np.allclose(center, expected))
 if __name__ == "__main__":
     unittest.main()
