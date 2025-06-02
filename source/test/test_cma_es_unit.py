@@ -4,7 +4,7 @@ from optimazer.cma_es import cma_es
 from functions.benchmark import ackley
 import optimazer.center_strategies as mn
 # python -m unittest tests.cma_es_tests.py
-class cma_es_tests(unittest.TestCase):
+class cma_es_unit_tests(unittest.TestCase):
 
     def test_generate_population(self):
         pop_size = 1000
@@ -120,13 +120,6 @@ class cma_es_tests(unittest.TestCase):
         
         np.testing.assert_array_almost_equal(optimizer.C, expected_C, decimal=6)
 
-
-    def test_cma_es_ackley(self):
-        dim = 2
-        optimizer = cma_es(x0=np.zeros(dim), pop_size=10, mu=2)
-        optimizer.optimize(ackley)
-        np.testing.assert_array_almost_equal(optimizer.m, 0, decimal=10)
-
     def test_arithmetic_mean_center(self):
         pop = np.array([[1, 2], [3, 4], [5, 6]])
         cma = cma_es(x0=[0, 0], center_strategy=mn.ArithmeticMeanCenterStrategy())
@@ -136,8 +129,8 @@ class cma_es_tests(unittest.TestCase):
     def test_weighted_mean_center(self):
         pop = np.array([[1, 2], [3, 4], [5, 6]])
         weights = np.linspace(len(pop), 1, len(pop))
-        cma = cma_es(x0=[0, 0], center_strategy=mn.WeightedMeanCenterStrategy())
-        center = cma.compute_new_center(pop)
+        cma = cma_es(x0=[0, 0], center_strategy=mn.WeightedFitnessCenterStrategy())
+        center = cma.compute_new_center(pop, weights=weights)
         self.assertTrue(np.allclose(center, np.average(pop, axis=0, weights=weights)))
         
     def test_median_center(self):

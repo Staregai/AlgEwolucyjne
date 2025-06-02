@@ -3,7 +3,7 @@ import numpy as np
 from optimazer.center_strategies import (
     ArithmeticMeanCenterStrategy,
     MedianCenterStrategy,
-    WeightedMeanCenterStrategy,
+    WeightedFitnessCenterStrategy,
     TrimmedMeanCenterStrategy,
 )
 
@@ -28,25 +28,23 @@ class TestCenterStrategy(unittest.TestCase):
             [1, 1],
             [2, 2],
             [3, 3],
-            [100, 100]  # outlier
+            [100, 100]  # odstający
         ])
         strategy = TrimmedMeanCenterStrategy()
         result = strategy.compute_center(vectors, trimmed_proportion=0.25)
         expected = np.mean(np.array([[2, 2], [3, 3]]), axis=0)
         np.testing.assert_array_almost_equal(result, expected)
 
-    def test_weighted_mean_center(self):
+    def test_weighted_fitness_center(self):
         vectors = np.array([
             [1, 1],
             [3, 3]
         ])
         weights = np.array([3, 1])
-        strategy = WeightedMeanCenterStrategy(weights=weights)
-        result = strategy.compute_center(vectors)
+        strategy = WeightedFitnessCenterStrategy()
+        result = strategy.compute_center(weights,vectors)
         expected = [1.5, 1.5]
         np.testing.assert_array_almost_equal(result, expected)
-
-    
 
 if __name__ == "__main__":
     unittest.main()

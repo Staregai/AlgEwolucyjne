@@ -18,10 +18,16 @@ class MedianCenterStrategy(CenterStrategy):
     def compute_center(self, vectors: np.ndarray) -> np.ndarray:
         return np.median(vectors, axis=0)
 
-class WeightedMeanCenterStrategy(CenterStrategy):
+class WeightedFitnessCenterStrategy(CenterStrategy):
     # weights w kolejności ideksów zgodnymi z vectors
     def compute_center(self, weights, vectors: np.ndarray) -> np.ndarray:
         return np.average(vectors, axis=0, weights = weights)
+
+class WeightedRankCenterStrategy(CenterStrategy):
+    # weights w kolejności ideksów zgodnymi z vectors
+    def compute_center(self, vectors: np.ndarray) -> np.ndarray:
+        weights = np.linspace(len(vectors), 1, len(vectors))
+        return np.average(vectors, axis=0, weights=weights)
 
 class TrimmedMeanCenterStrategy(CenterStrategy):
 
