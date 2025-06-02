@@ -3,7 +3,7 @@ import numpy as np
 from optimazer.cma_es import cma_es
 from functions.benchmark import ackley
 import optimazer.center_strategies as mn
-# python -m unittest tests.cma_es_tests.py
+# python -m unittest test.testscma_es_.py
 class cma_es_unit_tests(unittest.TestCase):
 
     def test_generate_population(self):

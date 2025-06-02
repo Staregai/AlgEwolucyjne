@@ -2,33 +2,39 @@ import optimazer.center_strategies as mn
 import numpy as np
 
 class cma_es:
-    def __init__(self, x0, sigma = 0.5, center_strategy: mn.CenterStrategy = mn.ArithmeticMeanCenterStrategy(), seed = 44, pop_size = 20, mu = 10, c_sigma = 0.3, d_sigma = 0.7,  c_c = 0.2, c_1 = 0.2, c_mu = 0.2, use_direct_mean = False):
+
+    def __init__(
+        self, x0, sigma=0.5, center_strategy=mn.ArithmeticMeanCenterStrategy(), seed=42, pop_size=None, mu=None, c_sigma=None, d_sigma=None, c_c=None, c_1=None, c_mu=None, use_direct_mean=False, max_iter=1000):
         # punkt startowy
         self.x0 = x0
+        # ustawienie wymiaru
+        self.dim = len(self.x0)
         # wariacja
         self.sigma = sigma
+        # max iter
+        self.max_iter = max_iter
         # strategia oblicznaia punktu środkowego
         self.center_strategy = center_strategy
         # seed generatora
         self.seed = seed
-        # rozmiar populacji
-        self.pop_size = pop_size   
-        # liczba selekcji najepszych rozwiązań
-        self.mu = mu 
-        # współczynnik ewolucji dla sigma (szybkość adaptacji kroku ewolucji)
-        self.c_sigma = c_sigma
-        # współczynnik tłumienia ewolucji dla sigma (regulacja tempa ewolucji)
-        self.d_sigma = d_sigma
-        # współczynnik ewolucji dla ścieżki ewolucji
-        self.c_c = c_c
-        # współczynnik ewolucji dla macierzy kowariancji
-        self.c_1 = c_1
-        # współczynnik ewolucji dla średniej macierzy kowariancji
-        self.c_mu = c_mu
-
         np.random.seed(self.seed)
 
-        self.dim = len(self.x0)
+        # https://arxiv.org/pdf/1604.00772#page=8&zoom=100,178,642 strona 31
+        # rozmiar populacji
+        self.pop_size = pop_size or (4 + int(3 * np.log(self.dim)))
+        # liczba selekcji najepszych rozwiązań
+        self.mu = mu or self.pop_size // 2
+        # współczynnik ewolucji dla sigma (szybkość adaptacji kroku ewolucji)
+        self.c_sigma = c_sigma or 0.3
+        # współczynnik tłumienia ewolucji dla sigma (regulacja tempa ewolucji)
+        self.d_sigma = d_sigma or (1 + 2 * max(0, np.sqrt((self.mu - 1) / (self.dim + 1)) - 1) + self.c_sigma)
+        # współczynnik ewolucji dla ścieżki ewolucji
+        self.c_c = c_c or ((4 + self.mu / self.dim) / (self.dim + 4 + 2 * self.mu / self.dim))
+        # współczynnik ewolucji dla macierzy kowariancji
+        self.c_1 = c_1 or (2 / ((self.dim + 1.3) ** 2 + self.mu))
+        # współczynnik ewolucji dla średniej macierzy kowariancji
+        self.c_mu = c_mu or min(1 - self.c_1, 2 * (self.mu - 2 + 1 / self.mu) / ((self.dim + 2) ** 2 + self.mu))
+
         # aktualny punkt środkowy
         self.m = np.copy(self.x0)
         # macierz kowariancji
@@ -42,8 +48,9 @@ class cma_es:
         # oczekiwana dlugosc wektora rozkładu normalnego
         self.E_norm = np.sqrt(self.dim) * (1 - 1/(4*self.dim) + 1/(21*self.dim**2))
 
-    def optimize(self, func, max_iter=1000):
-        for _ in range(max_iter):
+    def optimize(self, func):
+
+        for iter in range(self.max_iter):
             pop, d_list = self.generate_pop()
 
             fitness = np.array([func(x) for x in pop])
@@ -54,13 +61,9 @@ class cma_es:
             best_fitness = fitness[best_idx]
 
             # Update m
-            if self.use_direct_mean:
-                delta = np.mean(best_d, axis=0)
-                self.m = self.compute_new_center(best_pop, best_fitness)
-            else:
-                delta = self.compute_new_center(best_d, best_fitness)
-                self.m = self.m + self.sigma * delta
-
+            delta = self.compute_new_center(best_d, best_fitness)
+            self.m += self.sigma * delta
+           
             # Aktualizacja ścieżek i parametrów
             self.update_path_sigma(delta)
             self.update_sigma()
@@ -87,12 +90,15 @@ class cma_es:
         return np.array(pop), np.array(d_list)
 
     def update_path_sigma(self, delta):
-        C_inv_sqrt = np.linalg.inv(np.linalg.cholesky(self.C)).T
+        D, V = np.linalg.eigh(self.C)
+        C_inv_sqrt = V @ np.diag(1 / np.sqrt(D)) @ V.T
+        # C_inv_sqrt = np.linalg.inv(np.linalg.cholesky(self.C)).T
         self.p_sigma = (1 - self.c_sigma) * self.p_sigma + np.sqrt(self.c_sigma * (2 - self.c_sigma) * self.mu) * (C_inv_sqrt @ delta)
 
     def update_sigma(self):
         norm_p_sigma = np.linalg.norm(self.p_sigma)
         self.sigma = self.sigma * np.exp((self.c_sigma / self.d_sigma) * (norm_p_sigma / self.E_norm - 1))
+        self.sigma = np.clip(self.sigma, 1e-8, 1e2)
 
     def update_path_c(self, delta):
         self.p_c = (1.0 - self.c_c) * self.p_c + np.sqrt(self.c_c * (2.0 - self.c_c) * float(self.mu)) * delta
