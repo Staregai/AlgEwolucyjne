@@ -1,10 +1,85 @@
-class cma_parameters: 
+import numpy as np
+from center_strategies import * 
 
-    def __init__():
-     print('ala ma kota') 
+class CMAParameters:
 
-    def basic_parameters():
-       return []
-      
-    def cos_cos_parameters():
-       return []
+    def __init__(
+        self,
+        x0,
+        sigma=0.5,
+        max_iter=1000,
+        center_strategy=None,
+        seed=42,
+        pop_size=None,
+        mu=None,
+        c_sigma=None,
+        d_sigma=None,
+        c_c=None,
+        c_1=None,
+        c_mu=None,
+    ):
+        # punkt startowy
+        self.x0 = x0
+        # wariacja
+        self.sigma = sigma
+        # max iter
+        self.max_iter = max_iter
+        # strategia oblicznaia punktu środkowego
+        self.center_strategy = center_strategy or ArithmeticMeanCenterStrategy()
+        # seed generatora
+        self.seed = seed
+        self.pop_size = pop_size
+        # liczba selekcji najepszych rozwiązań
+        self.mu = mu
+        # współczynnik ewolucji dla sigma (szybkość adaptacji kroku ewolucji)
+        self.c_sigma = c_sigma
+        # współczynnik tłumienia ewolucji dla sigma (regulacja tempa ewolucji)
+        self.d_sigma = d_sigma
+        # współczynnik ewolucji dla ścieżki ewolucji
+        self.c_c = c_c
+        # współczynnik ewolucji dla macierzy kowariancji
+        self.c_1 = c_1
+        # współczynnik ewolucji dla średniej macierzy kowariancji
+        self.c_mu = c_mu
+
+    @staticmethod
+    def basic(x0, center_strategy=None, seed=44):
+        return CMAParameters(
+            x0=x0,
+            sigma=0.5,
+            max_iter=300,
+            center_strategy=center_strategy or ArithmeticMeanCenterStrategy(),
+            seed=42,
+            pop_size=None,
+            mu=None,
+            seed = 44,
+        )
+
+    @staticmethod
+    def basic_from_literature(x0, center_strategy=None, seed=44):
+
+        dim = len(x0)
+        pop_size = (4 + int(3 * np.log(dim)))
+        mu = pop_size // 2
+        c_sigma = 0.3
+        d_sigma = 1 + 2 * max(0, np.sqrt((mu - 1) / (dim + 1)) - 1) + c_sigma
+        c_c = (4 + mu / dim) / (dim + 4 + 2 * mu / dim)
+        c_1 = 2 / ((dim + 1.3) ** 2 + mu)
+        c_mu = min(
+            1 - c_1,
+            2 * (mu - 2 + 1 / mu) / ((dim + 2) ** 2 + mu),
+        )
+
+        return CMAParameters(
+            x0=np.array(x0),
+            sigma=0.5,
+            mu=mu,
+            c_sigma=0.3,
+            d_sigma=d_sigma,
+            c_c=c_c,
+            c_1=c_1,
+            c_mu=c_mu,
+            max_iter = 2000,
+            center_strategy=center_strategy or ArithmeticMeanCenterStrategy(),
+            seed=seed,
+        )
