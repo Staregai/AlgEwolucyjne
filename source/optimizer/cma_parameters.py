@@ -1,15 +1,15 @@
 import numpy as np
-from center_strategies import * 
+from optimizer.center_strategies import *
+
 
 class CMAParameters:
 
     def __init__(
         self,
-        x0,
         sigma=0.5,
         max_iter=1000,
-        center_strategy=None,
-        seed=42,
+        center_strategy: CenterStrategy  = ArithmeticMeanCenterStrategy(),
+        seed=44,
         pop_size=None,
         mu=None,
         c_sigma=None,
@@ -18,14 +18,12 @@ class CMAParameters:
         c_1=None,
         c_mu=None,
     ):
-        # punkt startowy
-        self.x0 = x0
         # wariacja
         self.sigma = sigma
         # max iter
         self.max_iter = max_iter
         # strategia oblicznaia punktu środkowego
-        self.center_strategy = center_strategy or ArithmeticMeanCenterStrategy()
+        self.center_strategy = center_strategy
         # seed generatora
         self.seed = seed
         self.pop_size = pop_size
@@ -49,16 +47,14 @@ class CMAParameters:
             sigma=0.5,
             max_iter=300,
             center_strategy=center_strategy or ArithmeticMeanCenterStrategy(),
-            seed=42,
+            seed= 44 ,
             pop_size=None,
-            mu=None,
-            seed = 44,
-        )
+            mu=None,  
+            )
 
     @staticmethod
-    def basic_from_literature(x0, center_strategy=None, seed=44):
+    def basic_from_literature(dim, center_strategy=None, seed=44):
 
-        dim = len(x0)
         pop_size = (4 + int(3 * np.log(dim)))
         mu = pop_size // 2
         c_sigma = 0.3
@@ -71,15 +67,15 @@ class CMAParameters:
         )
 
         return CMAParameters(
-            x0=np.array(x0),
             sigma=0.5,
             mu=mu,
+            pop_size= pop_size,
             c_sigma=0.3,
             d_sigma=d_sigma,
             c_c=c_c,
             c_1=c_1,
             c_mu=c_mu,
-            max_iter = 2000,
+            max_iter = 1000,
             center_strategy=center_strategy or ArithmeticMeanCenterStrategy(),
             seed=seed,
         )

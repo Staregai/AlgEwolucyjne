@@ -1,4 +1,4 @@
-from .center_strategies import (
+from optimizer.center_strategies import (
     CenterStrategy,
     ArithmeticMeanCenterStrategy,
     MedianCenterStrategy,

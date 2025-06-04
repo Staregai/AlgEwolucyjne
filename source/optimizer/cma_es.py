@@ -1,12 +1,18 @@
-import optimazer.center_strategies as mn
+import optimizer.center_strategies as mn
 import numpy as np
-from cma_parameters import CMAParameters 
+from optimizer.cma_parameters import CMAParameters
 
 class cma_es:
 
-    def __init__(self, cma_parameters: CMAParameters):
-
-        self.set_parameters(parameters = cma_parameters)
+    def __init__(
+        self,
+        x0,
+        parameters: CMAParameters = None,
+    ):
+        
+        cma_parameters = parameters or CMAParameters.basic_from_literature(dim = len(x0))
+        
+        self.set_parameters(x0, parameters = cma_parameters)
         # aktualny punkt środkowy
         self.m = np.copy(self.x0)
         # macierz kowariancji
@@ -20,8 +26,8 @@ class cma_es:
         # ustawienie seedu
         np.random.seed(self.seed)
 
-    def set_parameters(self, parameters: CMAParameters):
-        self.x0 = parameters.x0
+    def set_parameters(self, x0 ,parameters: CMAParameters):
+        self.x0 = x0
         self.dim = len(self.x0)
         self.sigma = parameters.sigma
         self.max_iter = parameters.max_iter

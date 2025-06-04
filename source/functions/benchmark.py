@@ -34,7 +34,6 @@ def griewank(x):
     prod_cos = np.prod(np.cos(x / np.sqrt(np.arange(1, len(x) + 1))))
     return sum_sq - prod_cos + 1
 
-
 def zakharov(x):
     sum1 = np.sum(x**2)
     sum2 = np.sum(0.5 * np.arange(1, len(x) + 1) * x)
