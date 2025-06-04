@@ -17,6 +17,7 @@ class CMAParameters:
         c_c=None,
         c_1=None,
         c_mu=None,
+        logging=None,
     ):
         # wariacja
         self.sigma = sigma
@@ -39,6 +40,8 @@ class CMAParameters:
         self.c_1 = c_1
         # współczynnik ewolucji dla średniej macierzy kowariancji
         self.c_mu = c_mu
+        # logowanie
+        self.loging = True
 
     @staticmethod
     def basic(x0, center_strategy=None, seed=44):

@@ -1,6 +1,7 @@
 import optimizer.center_strategies as mn
 import numpy as np
 from optimizer.cma_parameters import CMAParameters
+from logger import CMAESLogger
 
 class cma_es:
 
@@ -9,9 +10,8 @@ class cma_es:
         x0,
         parameters: CMAParameters = None,
     ):
-        
+        # parametry
         cma_parameters = parameters or CMAParameters.basic_from_literature(dim = len(x0))
-        
         self.set_parameters(x0, parameters = cma_parameters)
         # aktualny punkt środkowy
         self.m = np.copy(self.x0)
@@ -25,6 +25,8 @@ class cma_es:
         self.E_norm = np.sqrt(self.dim) * (1 - 1/(4*self.dim) + 1/(21*self.dim**2))
         # ustawienie seedu
         np.random.seed(self.seed)
+        # logger
+        self.logger = CMAESLogger(cma_parameters)
 
     def set_parameters(self, x0 ,parameters: CMAParameters):
         self.x0 = x0
@@ -62,6 +64,7 @@ class cma_es:
             self.update_sigma()
             self.update_path_c(delta)
             self.update_covariance(best_d)
+            self.logger.log(iter, pop, self.m, self.sigma, best_fitness[0])
 
         return self.m
 
