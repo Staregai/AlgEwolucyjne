@@ -52,13 +52,13 @@ def booth(x):
 
 benchmark_functions = {
     "sphere": sphere,
-    "rastrigin": rastrigin,
-    "rosenbrock": rosenbrock,
-    "ellipsoid": ellipsoid,
-    "ackley": ackley,
-    "schwefel": schwefel,
-    "griewank": griewank,
-    "zakharov": zakharov,
-    "michalewicz": michalewicz,
-    "booth": booth,
+    # "rastrigin": rastrigin,
+    # "rosenbrock": rosenbrock,
+    # "ellipsoid": ellipsoid,
+    # "ackley": ackley,
+    # "schwefel": schwefel,
+    # "griewank": griewank,
+    # "zakharov": zakharov,
+    # "michalewicz": michalewicz,
+    # "booth": booth,
 }

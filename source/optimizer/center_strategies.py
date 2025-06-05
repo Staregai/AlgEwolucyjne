@@ -24,7 +24,7 @@ class WeightedFitnessCenterStrategy(CenterStrategy):
         return np.average(vectors, axis=0, weights = weights)
 
 class WeightedRankCenterStrategy(CenterStrategy):
-    # weights w kolejności ideksów zgodnymi z vectors
+    # weights w kolejności ideksów zgodnymi z vectors, weights jako rangi
     def compute_center(self, vectors: np.ndarray) -> np.ndarray:
         weights = np.linspace(len(vectors), 1, len(vectors))
         return np.average(vectors, axis=0, weights=weights)
@@ -34,7 +34,16 @@ class TrimmedMeanCenterStrategy(CenterStrategy):
     def compute_center(self, vectors, trimmed_proportion = 0.1) -> np.ndarray:
         n = len(vectors)
         k = int(n * trimmed_proportion)
-        # sortujemy po sumie wartości w każdym wektorze
-        sorted_vectors = vectors[np.argsort(np.sum(vectors, axis=1))]
-        trimmed_vectors = sorted_vectors[k : n-k]
+        # sortujemy po sumie wartości w każdym wektorze (zbędne)
+        # sorted_vectors = vectors[np.argsort(np.sum(vectors, axis=1))]
+        trimmed_vectors = vectors[k : n-k]
         return np.mean(trimmed_vectors, axis = 0)
+
+
+enter_strategies = [
+    ArithmeticMeanCenterStrategy(),
+    MedianCenterStrategy(),
+    WeightedFitnessCenterStrategy(),
+    WeightedRankCenterStrategy(),
+    TrimmedMeanCenterStrategy(),
+]

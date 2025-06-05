@@ -42,6 +42,7 @@ class cma_es:
         self.c_c = parameters.c_c
         self.c_1 = parameters.c_1
         self.c_mu = parameters.c_mu
+        self.loging = parameters.loging
 
     def optimize(self, func):
 
@@ -64,7 +65,9 @@ class cma_es:
             self.update_sigma()
             self.update_path_c(delta)
             self.update_covariance(best_d)
-            self.logger.log(iter, pop, self.m, self.sigma, best_fitness[0])
+
+            if self.loging:
+                self.logger.log(iter, pop, self.m, self.sigma, best_fitness[0])
 
         return self.m
 
