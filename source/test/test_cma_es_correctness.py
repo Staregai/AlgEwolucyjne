@@ -10,7 +10,8 @@ class cma_es_correctness_tests(unittest.TestCase):
 
     def run_optimizer_and_check(self, func, dim=10, known_min=0.0, tol=1e-2, x0 = None):
         x0_run = np.zeros(dim) if x0 is None else x0
-        optimizer = cma_es(x0=x0_run)
+        bounds = benchmark_bounds.get(func.__name__, None)
+        optimizer = cma_es(x0=x0_run,bounds=bounds)
         optimizer.max_iter = 1000
         optimizer.sigma = 0.5
         optimizer.optimize(func)
