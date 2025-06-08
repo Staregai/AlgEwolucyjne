@@ -1,11 +1,11 @@
 import numpy as np
 import cma
-from optimizer.cma_es import cma_es
+from source.optimizer.cma_es import cma_es
 import os
 import csv
-from functions.benchmark import benchmark_functions, benchmark_bounds
+from source.functions.benchmark import benchmark_functions, benchmark_bounds
 import tqdm
-from optimizer.center_strategies import enter_strategies
+from source.optimizer.center_strategies import enter_strategies
 from datetime import datetime
 
 # PS python -m experiments.run_experiments
@@ -17,8 +17,8 @@ DIMENSIONS = [
             #    100
                ]
 REPEATS = 1
-OUTPUT_DIR = "experiments/results"
-SEED_FILE = "experiments/seeds.txt"
+OUTPUT_DIR = "source/experiments/results"
+SEED_FILE = "source/experiments/seeds.txt"
 
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
@@ -32,9 +32,8 @@ for func_name, func in benchmark_functions.items():
             for run in range(REPEATS):
                 seed = seeds[run]
                 bounds = benchmark_bounds.get(func_name, None)
-
                 x0 = np.random.randn(dim)
-                optimizer = cma_es(x0=x0, bounds=bounds)
+                optimizer = cma_es(x0)
                 optimizer.center_strategy = actual_strategy
                 optimizer.logger.log_step = 10
 

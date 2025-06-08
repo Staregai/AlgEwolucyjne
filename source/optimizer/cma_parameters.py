@@ -6,6 +6,7 @@ class CMAParameters:
 
     def __init__(
         self,
+        x0 = None,
         sigma=0.5,
         max_iter=1000,
         center_strategy: CenterStrategy  = ArithmeticMeanCenterStrategy(),
@@ -19,6 +20,7 @@ class CMAParameters:
         c_mu=None,
         logging=None,
     ):
+        self.x0 = x0
         # wariacja
         self.sigma = sigma
         # max iter

@@ -9,6 +9,7 @@ class cma_es:
         self,
         x0,
         parameters: CMAParameters = None,
+        bounds = None,
     ):
         # parametry
         cma_parameters = parameters or CMAParameters.basic_from_literature(dim = len(x0))
@@ -27,6 +28,7 @@ class cma_es:
         np.random.seed(self.seed)
         # logger
         self.logger = CMAESLogger(cma_parameters)
+        self.bounds = bounds
 
     def set_parameters(self, x0 ,parameters: CMAParameters):
         self.x0 = x0
@@ -57,7 +59,13 @@ class cma_es:
             best_fitness = fitness[best_idx]
 
             # Update m
-            delta = self.compute_new_center(best_d, best_fitness)
+            if isinstance(self.center_strategy, mn.WeightedFitnessCenterStrategy):
+                # Im mniejszy fitness, tym większa waga
+                weights = 1.0 / (best_fitness + 1e-8)
+                weights /= np.sum(weights)  # normalizacja, opcjonalnie
+                delta = self.compute_new_center(best_d, weights)
+            else:
+                delta = self.compute_new_center(best_d)
             self.m += self.sigma * delta
 
             # Aktualizacja ścieżek i parametrów
@@ -84,20 +92,26 @@ class cma_es:
         for _ in range(self.pop_size):
             d = np.random.multivariate_normal(np.zeros(self.dim), self.C)
             x = self.m + self.sigma * d
+            if self.bounds is not None:
+                lower, upper = self.bounds
+                x = np.clip(x, lower, upper) 
             d_list.append(d)
             pop.append(x)
         return np.array(pop), np.array(d_list)
 
     def update_path_sigma(self, delta):
         D, V = np.linalg.eigh(self.C)
+        D = np.clip(D, 1e-10, None)
         C_inv_sqrt = V @ np.diag(1 / np.sqrt(D)) @ V.T
         # C_inv_sqrt = np.linalg.inv(np.linalg.cholesky(self.C)).T
         self.p_sigma = (1 - self.c_sigma) * self.p_sigma + np.sqrt(self.c_sigma * (2 - self.c_sigma) * self.mu) * (C_inv_sqrt @ delta)
 
     def update_sigma(self):
         norm_p_sigma = np.linalg.norm(self.p_sigma)
-        self.sigma = self.sigma * np.exp((self.c_sigma / self.d_sigma) * (norm_p_sigma / self.E_norm - 1))
-        self.sigma = np.clip(self.sigma, 1e-8, 1e2)
+        arg = (self.c_sigma / self.d_sigma) * (norm_p_sigma / self.E_norm - 1)
+        arg = np.clip(arg, -20, 20)
+        self.sigma = self.sigma * np.exp(arg)
+        self.sigma = np.clip(self.sigma, 1e-8, 1e8)
 
     def update_path_c(self, delta):
         self.p_c = (1.0 - self.c_c) * self.p_c + np.sqrt(self.c_c * (2.0 - self.c_c) * float(self.mu)) * delta
@@ -106,3 +120,4 @@ class cma_es:
         rank_one = self.c_1 * np.outer(self.p_c, self.p_c)
         rank_mu = self.c_mu * np.mean([np.outer(d, d) for d in best_d], axis=0)
         self.C = (1 - self.c_1 - self.c_mu) * self.C + rank_one + rank_mu
+        self.C += np.eye(self.dim) * 1e-8 
