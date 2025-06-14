@@ -12,6 +12,7 @@ import pickle
 
 RESULTS_CSV = "performance_results.csv"
 RESULTS_PKL = "performance_results.pkl"
+CONV_CURVES_DIR = "convergence_curves"
 
 class TestCMAESPerformance(unittest.TestCase):
     def setUp(self):
@@ -21,6 +22,7 @@ class TestCMAESPerformance(unittest.TestCase):
         self.sigma = 0.5
         self.seeds = [42, 123, 7, 2024, 999]
         self.results = {}  # (func_name, strategy_name) -> [fx, fx, ...]
+        os.makedirs(CONV_CURVES_DIR, exist_ok=True)
 
     def run_optimizer(self, func, center_strategy, seed):
         params = CMAParameters.basic_from_literature(
@@ -30,6 +32,17 @@ class TestCMAESPerformance(unittest.TestCase):
         params.sigma = self.sigma
         optimizer = cma_es(x0=self.x0, parameters=params)
         result = optimizer.optimize(func)
+        # --- ZAPISZ KRZYWĄ ZBIEŻNOŚCI ---
+        curve = getattr(optimizer, "f_history", None)
+        if curve is None and hasattr(optimizer, "logger"):
+            curve = getattr(optimizer.logger, "best_fitness_history", None)
+        if curve is not None:
+            curve_filename = f"{CONV_CURVES_DIR}/{func.__name__}_{type(center_strategy).__name__}_seed{seed}.csv"
+            with open(curve_filename, "w", newline="") as f:
+                writer = csv.writer(f)
+                writer.writerow(["iteration", "fx"])
+                for i, fx_iter in enumerate(curve):
+                    writer.writerow([i, fx_iter])
         return result
 
     def save_results_to_csv(self, filename=RESULTS_CSV):
