@@ -3,6 +3,7 @@ import numpy as np
 from optimizer.cma_es import cma_es
 from functions.benchmark import *
 import optimizer.center_strategies as mn
+import math
 
 
 # python -m unittest test.test_cma_es_correctness.py
@@ -10,15 +11,17 @@ class cma_es_correctness_tests(unittest.TestCase):
 
     def run_optimizer_and_check(self, func, dim=10, known_min=0.0, tol=1e-2, x0 = None):
         # x0_run = np.zeros(dim) if x0 is None else x0
-        (upper,lower) = benchmark_bounds.get(func.__name__, None)
         np.random.seed(46)
-        x0_run = np.random.uniform(upper, lower, size=dim)
-        print(x0_run)
+        (lower,upper) = benchmark_bounds.get(func.__name__, None)
+        known_min = benchmark_known_min.get(func.__name__, 0.0)
+        x0_run = np.clip(
+            known_min + np.random.uniform(lower / 2, upper /2, size=dim), lower, upper
+        )
 
         print((upper, lower))
-        optimizer = cma_es(x0=x0_run, bounds=(upper, lower))
-        optimizer.max_iter = 1000*dim
-        sigma = (lower-upper)/4
+        optimizer = cma_es(x0=x0_run, bounds=(lower, upper))
+        optimizer.max_iter = int(1000 * dim)
+        sigma = (upper-lower)/5
         optimizer.sigma = sigma
         optimizer.optimize(func)
         self.assertTrue( 

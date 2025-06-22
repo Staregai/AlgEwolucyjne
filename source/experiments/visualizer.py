@@ -5,11 +5,15 @@ import matplotlib.pyplot as plt
 from functions.benchmark import benchmark_functions
 
 SAVE_DIR = "results/plots"
+DIMS = [2, 5, 10, 20]
 
-def plot_convergence_curves(curves_dir="results", func_name="rastrigin", strategies=None):
 
-    os.makedirs(SAVE_DIR, exist_ok=True)
-
+def plot_convergence_curves(
+    curves_dir="results/convergence",
+    func_name="rastrigin",
+    strategies=None,
+    save_dir="results/plots",
+):
     if strategies is None:
         strategies = [
             "ArithmeticMeanCenterStrategy",
@@ -18,31 +22,110 @@ def plot_convergence_curves(curves_dir="results", func_name="rastrigin", strateg
             "WeightedRankCenterStrategy",
             "TrimmedMeanCenterStrategy",
         ]
-    plt.figure(figsize=(10, 6))
-    for strategy in strategies:
-        all_curves = []
-        files = glob.glob(f"{curves_dir}/convergence/{func_name}_{strategy}_seed*.csv")
-        for file in files:
-            df = pd.read_csv(file)
-            all_curves.append(df["fx"].values)
-        if all_curves:
-            min_len = min(len(curve) for curve in all_curves)
-            all_curves = [curve[:min_len] for curve in all_curves]
-            mean_curve = sum(all_curves) / len(all_curves)
-            plt.plot(range(min_len), mean_curve, label=strategy)
-    plt.yscale("log")
-    plt.xlabel("Iteracja")
-    plt.ylabel("f(x)")
-    plt.title(f"Krzywe zbieżności dla {func_name}")
-    plt.legend()
-    plt.tight_layout()
-    plot_path = os.path.join(SAVE_DIR, f"convergence_{func_name}.png")
+    os.makedirs(save_dir, exist_ok=True)
+
+    # osobne dla kazdego wymiaru
+    for dim in DIMS:
+        plt.figure(figsize=(10, 6))
+        any_curve = False
+        for strategy in strategies:
+            all_curves = []
+            files = glob.glob(f"{curves_dir}/{func_name}_{strategy}_dim{dim}_seed*.csv")
+            if not files:
+                print(
+                    f"Brak plików dla strategii {strategy}, funkcji {func_name}, dim={dim}"
+                )
+            for file in files:
+                df = pd.read_csv(file)
+                if "fx" in df.columns and len(df["fx"]) > 0:
+                    all_curves.append(df["fx"].values)
+            if all_curves:
+                any_curve = True
+                min_len = min(len(curve) for curve in all_curves)
+                all_curves = [curve[:min_len] for curve in all_curves]
+                mean_curve = sum(all_curves) / len(all_curves)
+                iteration_values = df["iteration"].values[:min_len]
+                plt.plot(iteration_values, mean_curve, label=strategy)
+        if not any_curve:
+            print(f"Brak danych do narysowania wykresu dla dim={dim}!")
+            plt.close()
+            continue
+
+        all_fx = []
+        for line in plt.gca().get_lines():
+            all_fx.extend(line.get_ydata())
+        min_fx = min(all_fx)
+        if min_fx > 0:
+            plt.yscale("log")
+        else:
+            plt.yscale("linear")
+            print("Uwaga: Wartości <= 0, wykres na skali liniowej.")
+        plt.xlabel("Iteracja")
+        plt.ylabel("f(x)")
+        plt.title(f"Krzywa zbieżności: {func_name}, dim={dim}")
+        plt.legend()
+        plt.tight_layout()
+        plot_path = os.path.join(save_dir, f"convergence_{func_name}_dim{dim}.png")
+        plt.savefig(plot_path)
+        print(f"Saved plot to {plot_path}")
+        plt.close()
+
+    # jeden wykres 4 subploty
+    fig, axs = plt.subplots(2, 2, figsize=(14, 10))
+    axs = axs.flatten()
+    for idx, dim in enumerate(DIMS):
+        ax = axs[idx]
+        any_curve = False
+        for strategy in strategies:
+            all_curves = []
+            files = glob.glob(f"{curves_dir}/{func_name}_{strategy}_dim{dim}_seed*.csv")
+            for file in files:
+                df = pd.read_csv(file)
+                if "fx" in df.columns and len(df["fx"]) > 0:
+                    all_curves.append(df["fx"].values)
+            if all_curves:
+                any_curve = True
+                min_len = min(len(curve) for curve in all_curves)
+                all_curves = [curve[:min_len] for curve in all_curves]
+                mean_curve = sum(all_curves) / len(all_curves)
+                ax.plot(range(min_len), mean_curve, label=strategy)
+        if any_curve:
+            all_fx = []
+            for line in ax.get_lines():
+                all_fx.extend(line.get_ydata())
+            min_fx = min(all_fx)
+            if min_fx > 0:
+                ax.set_yscale("log")
+            else:
+                ax.set_yscale("linear")
+            ax.set_title(f"dim={dim}")
+            ax.set_xlabel("Iteracja")
+            ax.set_ylabel("f(x)")
+            ax.legend(fontsize=8)
+        else:
+            ax.set_title(f"dim={dim} (brak danych)")
+            ax.axis("off")
+    plt.suptitle(f"Krzywe zbieżności dla {func_name} (różne wymiary)", fontsize=16)
+    plt.tight_layout(rect=[0, 0.03, 1, 0.95])
+    plot_path = os.path.join(save_dir, f"convergence_{func_name}_subplots.png")
     plt.savefig(plot_path)
-    print(f"Saved plot to {plot_path}")
-    plt.show()
+    print(f"Saved subplot to {plot_path}")
+    plt.close()
+
 
 if __name__ == "__main__":
-    for func_name in benchmark_functions.keys():
-        print(f"Plotting convergence curves for {func_name}")
-        plot_convergence_curves(func_name=func_name)
-    print("All convergence curves plotted.")
+    functions = [
+        "sphere"
+        # ,
+        # "rosenbrock",
+        # "rastrigin",
+        # "ellipsoid", 
+        # "ackley" "schwefel",
+        # "griewank",
+        # "zakharov",
+        # "michalewicz",
+        # "booth",
+    ]
+
+    for func in functions:
+        plot_convergence_curves(func_name=func)

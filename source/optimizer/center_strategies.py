@@ -34,7 +34,7 @@ class TrimmedMeanCenterStrategy(CenterStrategy):
     def compute_center(self, vectors, trimmed_proportion = 0.1) -> np.ndarray:
         n = len(vectors)
         k = int(n * trimmed_proportion)
-        # sortujemy po sumie wartości w każdym wektorze (zbędne)
+        # sortujemy po sumie wartości w każdym wektorze (zbędne imo)
         # sorted_vectors = vectors[np.argsort(np.sum(vectors, axis=1))]
         trimmed_vectors = vectors[k : n-k]
         return np.mean(trimmed_vectors, axis = 0)

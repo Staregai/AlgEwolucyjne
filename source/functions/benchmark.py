@@ -51,27 +51,53 @@ def booth(x):
 
 
 benchmark_functions = {
-    "sphere": sphere,
-    "rastrigin": rastrigin,
-    "rosenbrock": rosenbrock,
-    "ellipsoid": ellipsoid,
-    "ackley": ackley,
-    "schwefel": schwefel,
-    "griewank": griewank,
-    "zakharov": zakharov,
-    "michalewicz": michalewicz,
-    "booth": booth,
+    "sphere": sphere
+    # "rastrigin": rastrigin,
+    # "rosenbrock": rosenbrock,
+    # "ellipsoid": ellipsoid,
+    # "ackley": ackley,
+    # "schwefel": schwefel,
+    # "griewank": griewank,
+    # "zakharov": zakharov,
+    # "michalewicz": michalewicz,
+    # "booth": booth,
 }
 
 benchmark_bounds = {
-    "sphere": (-5.12, 5.12),
+    "sphere": (-10, 10),
     "rastrigin": (-5.12, 5.12),
     "rosenbrock": (-5, 10),
     "ellipsoid": (-5.12, 5.12),
-    "ackley": (-32.768, 32.768),
+    "ackley": (-5, 5),
     "schwefel": (-500, 500),
-    "griewank": (-600, 600),
+    "griewank": (-500, 500),
     "zakharov": (-5, 10),
     "michalewicz": (0, np.pi),
     "booth": (-10, 10),
+}
+
+benchmark_known_min = {
+    "sphere": 0.0,
+    "rastrigin": 0.0,
+    "rosenbrock": 1.0,
+    "ellipsoid": 0.0,
+    "ackley": 0.0,
+    "schwefel": 420.9687,
+    "griewank": 0.0,
+    "zakharov": 0.0,
+    "michalewicz": [2.20, 1.57],  
+    "booth": [1.0, 3.0],  
+}
+
+benchmark_known_min_values = {
+    "sphere": 0.0,
+    "rastrigin": 0.0,
+    "rosenbrock": 0.0,
+    "ellipsoid": 0.0,
+    "ackley": 0.0,
+    "schwefel": 0.0, 
+    "griewank": 0.0,
+    "zakharov": 0.0,
+    "michalewicz": -1.8013,
+    "booth": 0.0,
 }

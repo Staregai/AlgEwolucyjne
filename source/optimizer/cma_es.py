@@ -10,6 +10,7 @@ class cma_es:
         x0,
         parameters: CMAParameters = None,
         bounds = None,
+        seed = None
     ):
         # parametry
         cma_parameters = parameters or CMAParameters.basic_from_literature(dim = len(x0))
@@ -25,6 +26,7 @@ class cma_es:
         # oczekiwana dlugosc wektora rozkładu normalnego
         self.E_norm = np.sqrt(self.dim) * (1 - 1/(4*self.dim) + 1/(21*self.dim**2))
         # ustawienie seedu
+        self.seed = seed or self.seed
         np.random.seed(self.seed)
         # logger
         self.logger = CMAESLogger(cma_parameters)
@@ -59,7 +61,7 @@ class cma_es:
 
             # Update m
             if isinstance(self.center_strategy, mn.WeightedFitnessCenterStrategy):
-                # Im mniejszy fitness, tym większa waga
+                # im mniejszy fitness, tym większa waga
                 weights = 1.0 / (best_fitness + 1e-8)
                 weights /= np.sum(weights)  # normalizacja, opcjonalnie
                 delta = self.compute_new_center(best_d, weights)
@@ -67,7 +69,7 @@ class cma_es:
                 delta = self.compute_new_center(best_d)
             self.m += self.sigma * delta
 
-            # Aktualizacja ścieżek i parametrów
+            # aktualizacja ścieżek i parametrów
             self.update_path_sigma(delta)
             self.update_sigma()
             self.update_path_c(delta)

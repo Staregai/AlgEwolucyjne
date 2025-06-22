@@ -1,7 +1,7 @@
 import numpy as np
 from  optimizer.cma_parameters import * 
 class CMAESLogger:
-    def __init__(self, cma_parameters, log_step=100):
+    def __init__(self, cma_parameters, log_step=10):
         self.log_step = log_step
         self.cma_parameters: CMAParameters = cma_parameters
         self.population_history = []
