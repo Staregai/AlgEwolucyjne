@@ -1,0 +1,85 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+\usepackage[polish]{babel}
+\usepackage{polski}
+\usepackage[utf8]{inputenc}
+
+\title{Algorytmy genetyczne - kontrola przystosowania punktu środkowego populacji - dokumentacja wstępna}
+\author{Kacper Król, Igor Staręga}
+\date{Kwiecien 2025}
+
+\begin{document}
+
+\maketitle
+
+\section{Wstęp}
+
+Algorytm genetyczny (AG) to metoda optymalizacji inspirowana mechanizmami ewolucji biologicznej, takimi jak selekcja, krzyżowanie i mutacja. Dzięki populacyjnemu charakterowi AG dobrze radzi sobie z eksploracją złożonych przestrzeni rozwiązań. Jednym z mniej oczywistych, ale istotnych elementów algorytmu jest punkt środkowy populacji, który może służyć jako wskaźnik kierunku poszukiwań. Odpowiedni sposób jego definiowania może znacząco wpłynąć na efektywność działania algorytmu.
+
+
+\section{Opis problemu}
+
+W wielu algorytmach ewolucyjnych, takich jak CMA-ES, punkt środkowy populacji pełni funkcję centralnego odniesienia przy generowaniu nowych rozwiązań. Sposoby jego wyznaczania takie jak: średnia ważona, czy mediana znacząco wpływają na równowagę między eksploracja a eksploatacją.
+
+W projekcie analizowany będzie wpływ różnych definicji punktu środkowego na jakość działania algorytmu AG. Eksperymenty zostaną przeprowadzone na wybranych funkcjach testowych oceniając parametry takie jak tempo zbieżności i jakość końcowych rozwiązań. 
+
+% Kontrola przystosowania punktu środkowego populacji jest sposobem na poprawienie jakości działania algorytmów ewolucyjnych. Na wybranym przez siebie algorytmie ewolucyjnym zbadaj wpływ sposobu zdefiniowania punktu środkowego na działanie tego algorytmu.
+
+% Poza statystykami jak średnia arytmetyczna lub mediana zbadaj różne warianty średniej ważonej oraz statystyki odporne. Wykorzystaj wybrane funkcje testowe.
+\section{Opis proponowanej metody}
+
+W projekcie zaproponowano różne sposoby wyznaczania punktu środkowego populacji w algorytmie CMA-ES. W projekcie zostaną zaimplementowane następujące podejścia:
+\begin{itemize}
+    \item klasyczna średnia arytmetyczna z uwzględnieniem wartości funkcji celu,
+    \item mediana środkowa wartości funkcji celu,
+    \item średnia ważona, w której wagi zależą od rankingu lub innego czynnika,
+    \item średnia obcięta – wartość średnia po odrzuceniu skrajnych 10\% najlepszych i najgorszych rozwiązań,
+    \item medoid – osobnik o minimalnej sumie odległości do pozostałych elementów populacji.
+\end{itemize}
+
+Zaproponowane metody zostaną zastosowane praktycznie w ramach algorytmu CMA-ES, w celu oceny ich wpływu na jakość na procesu optymalizacji. Punkt środkowy populacji ma istotny wpływ na działanie CMA-ES. Decyduje on o aktualizacji środka rozkładu, z którego generowane są kolejne rozwiązania. tym samym kierując proces optymalizacji w stronę bardziej obiecujących obszarów przestrzeni poszukiwań. Dlatego odgrywa kluczową rolę w utrzymaniu równowagi między eksploracją a eksploatacją oraz w całym algorytmie.
+
+\section{Testy i eksperymenty}
+
+W ramach projektu planuje się przeprowadzenie testów porównujących skuteczność różnych strategii wyznaczania punktu środkowego w algorytmie CMA-ES. Eksperymenty zostaną wykonane na standardowych funkcjach optymalizacyjnych, takich jak:
+
+\begin{itemize}
+    \item Sphere - prosta, wypukła, unimodalna
+    \item Rosenbrocka - wąska dolina, trudna eksploracja
+    \item Rastrigina - wielomodalna, trudna do zbieżności
+\end{itemize} 
+
+Dla każdej metody i funkcji zostaną ocenione: szybkość zbieżności (liczba iteracji do osiągnięcia założonego progu), jakość końcowego rozwiązania, stabilność wyników (średnia, odchylenie standardowe) oraz odporność na zakłócenia. Dodatkowo planowane są testy wrażliwości na parametry wybranych metod, takie jak poziom obcięcia wartości skrajnych w średniej obciętej czy sposób wyznaczania wag w średnich ważonych. Uzyskane wyniki pozwolą ocenić, który wariant wyznaczania punktu środkowego osiąga najlepsze wyniki.
+
+\section{Wybór technologii i narzędzi}
+
+Do realizacji projektu wybrano język Python ze względu na jego prostotę, szeroką dostępność bibliotek numerycznych (NumPy, SciPy) oraz gotowych implementacji algorytmów ewolucyjnych. W szczególności wykorzystana zostanie biblioteka \texttt{cma}, zawierająca elastyczną implementację algorytmu CMA-ES, umożliwiającą modyfikację sposobu wyznaczania punktu środkowego populacji.
+
+W razie potrzeby możliwe będzie także stworzenie własnej uproszczonej wersji algorytmu w celu pełnej kontroli nad jego działaniem.  
+
+% Do terminu 14.04.2025 zespół zobowiązany jest przekazać dokumentację wstępną w postaci pliku pdf. Plik dokumentacji należy zatytułować w nastepujący sposób:
+
+% wae-init-@-2025L.pdf
+
+% Przy czym za symbol @ należy podstawić numer zadania projektowego.
+
+% Treść dokumentacji wstępnej powinna składać się z:
+
+% opisu problemu i jego sposobu rozwiązania
+
+% planowanych eksperymentów numerycznych
+
+% wyboru technologii, w której realizowany będzie projekt.
+
+% Dokument nie powinien przekraczać 2 stron A4.
+
+% Ponadto należy mieć na uwadze, że celem dokumentacji wstępnej jest przedstawienie swojej pierwszej wizji dotyczącej realizowanego projektu, która pozwoli prowadzącemu ocenić czy zespół poprawnie zrozumiał dany temat i wybrał odpowiednie narzędzia. Ewolucja wizji (nawet skrajna) w trakcie realizacji jest jak najbardziej akceptowalna.
+
+% Dokumentacja wstępna oceniana jest binarnie. Niedostarczenie dokumentacji wstępnej w powyżej wskazanym terminie rownóważny jest rezygnacji z realizacji projektu.
+
+
+% Kontrola przystosowania punktu środkowego populacji jest sposobem na poprawienie jakości działania algorytmów ewolucyjnych. Na wybranym przez siebie algorytmie ewolucyjnym zbadaj wpływ sposobu zdefiniowania punktu środkowego na działanie tego algorytmu.
+
+% Poza statystykami jak średnia arytmetyczna lub mediana zbadaj różne warianty średniej ważonej oraz statystyki odporne. Wykorzystaj wybrane funkcje testowe.
+
+\end{document}
