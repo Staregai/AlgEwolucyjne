@@ -54,7 +54,6 @@ class cma_es:
             fitness = np.array([func(x) for x in pop])
             idx = np.argsort(fitness)
             best_idx = idx[:self.mu]
-            best_pop = pop[best_idx]
             best_d = d_list[best_idx]
             best_fitness = fitness[best_idx]
 
