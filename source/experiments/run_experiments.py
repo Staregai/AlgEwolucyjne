@@ -11,11 +11,11 @@ from datetime import datetime
 # PS python -m experiments.run_experiments
 
 DIMENSIONS = [
-          2, 
-        #   5, 10,
-            #    30, 50, 
-            #    100
-               ]
+    2,
+    #   5, 10,
+    #    30, 50,
+    #    100
+]
 REPEATS = 1
 OUTPUT_DIR = "experiments/results"
 SEED_FILE = "experiments/seeds.txt"

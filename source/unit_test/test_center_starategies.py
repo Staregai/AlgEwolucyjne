@@ -25,27 +25,20 @@ class TestCenterStrategy(unittest.TestCase):
         np.testing.assert_array_equal(result, expected)
 
     def test_trimmed_mean_center(self):
-        vectors = np.array([
-            [1, 1],
-            [2, 2],
-            [3, 3],
-            [100, 100]  # odstający
-        ])
+        vectors = np.array([[1, 1], [2, 2], [3, 3], [100, 100]])  # odstający
         strategy = TrimmedMeanCenterStrategy()
         result = strategy.compute_center(vectors, trimmed_proportion=0.25)
         expected = np.mean(np.array([[2, 2], [3, 3]]), axis=0)
         np.testing.assert_array_almost_equal(result, expected)
 
     def test_weighted_fitness_center(self):
-        vectors = np.array([
-            [1, 1],
-            [3, 3]
-        ])
+        vectors = np.array([[1, 1], [3, 3]])
         weights = np.array([3, 1])
         strategy = WeightedFitnessCenterStrategy()
-        result = strategy.compute_center(weights,vectors)
+        result = strategy.compute_center(weights, vectors)
         expected = [1.5, 1.5]
         np.testing.assert_array_almost_equal(result, expected)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -9,22 +9,22 @@ import math
 # python -m unittest test.test_cma_es_correctness.py
 class cma_es_correctness_tests(unittest.TestCase):
 
-    def run_optimizer_and_check(self, func, dim=10, known_min=0.0, tol=1e-2, x0 = None):
+    def run_optimizer_and_check(self, func, dim=10, known_min=0.0, tol=1e-2, x0=None):
         # x0_run = np.zeros(dim) if x0 is None else x0
         np.random.seed(46)
-        (lower,upper) = benchmark_bounds.get(func.__name__, None)
+        (lower, upper) = benchmark_bounds.get(func.__name__, None)
         known_min = benchmark_known_min.get(func.__name__, 0.0)
         x0_run = np.clip(
-            known_min + np.random.uniform(lower / 2, upper /2, size=dim), lower, upper
+            known_min + np.random.uniform(lower / 2, upper / 2, size=dim), lower, upper
         )
 
         print((upper, lower))
         optimizer = cma_es(x0=x0_run, bounds=(lower, upper))
         optimizer.max_iter = int(1000 * dim)
-        sigma = (upper-lower)/5
+        sigma = (upper - lower) / 5
         optimizer.sigma = sigma
         optimizer.optimize(func)
-        self.assertTrue( 
+        self.assertTrue(
             np.allclose(optimizer.m, known_min, atol=tol),
             msg=f"{func.__name__} failed: got {optimizer.m}, expected {known_min}",
         )
@@ -54,7 +54,9 @@ class cma_es_correctness_tests(unittest.TestCase):
         self.run_optimizer_and_check(ellipsoid, dim=10, known_min=0.0)
 
     def test_schwefel(self):
-        self.run_optimizer_and_check(schwefel, dim=2, known_min=420.96, tol=1, x0=np.full(2, 410.0))
+        self.run_optimizer_and_check(
+            schwefel, dim=2, known_min=420.96, tol=1, x0=np.full(2, 410.0)
+        )
 
     def test_griewank(self):
         self.run_optimizer_and_check(griewank, dim=10, known_min=0.0, tol=1e-2)
@@ -65,10 +67,13 @@ class cma_es_correctness_tests(unittest.TestCase):
     # nie moze sie wyciagnac z jakiegos minimum bo x się zgadza
     # https://www.sfu.ca/~ssurjano/michal.html
     def test_michalewicz(self):
-        self.run_optimizer_and_check(michalewicz, dim=2, known_min=[2.20, 1.57], tol=0.1)
+        self.run_optimizer_and_check(
+            michalewicz, dim=2, known_min=[2.20, 1.57], tol=0.1
+        )
 
     def test_booth(self):
         self.run_optimizer_and_check(booth, dim=2, known_min=[1.0, 3.0], tol=1e-2)
+
 
 if __name__ == "__main__":
     unittest.main()

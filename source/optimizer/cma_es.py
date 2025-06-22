@@ -3,18 +3,13 @@ import numpy as np
 from optimizer.cma_parameters import CMAParameters
 from logger import CMAESLogger
 
+
 class cma_es:
 
-    def __init__(
-        self,
-        x0,
-        parameters: CMAParameters = None,
-        bounds = None,
-        seed = None
-    ):
+    def __init__(self, x0, parameters: CMAParameters = None, bounds=None, seed=None):
         # parametry
-        cma_parameters = parameters or CMAParameters.basic_from_literature(dim = len(x0))
-        self.set_parameters(x0, parameters = cma_parameters)
+        cma_parameters = parameters or CMAParameters.basic_from_literature(dim=len(x0))
+        self.set_parameters(x0, parameters=cma_parameters)
         # aktualny punkt środkowy
         self.m = np.copy(self.x0)
         # macierz kowariancji
@@ -22,9 +17,11 @@ class cma_es:
         # sciezka ewolucji dla sigma
         self.p_sigma = np.zeros(self.dim)
         # sciezka ewolucji dla macierzy kowariancji
-        self.p_c = np.zeros(self.dim) 
+        self.p_c = np.zeros(self.dim)
         # oczekiwana dlugosc wektora rozkładu normalnego
-        self.E_norm = np.sqrt(self.dim) * (1 - 1/(4*self.dim) + 1/(21*self.dim**2))
+        self.E_norm = np.sqrt(self.dim) * (
+            1 - 1 / (4 * self.dim) + 1 / (21 * self.dim**2)
+        )
         # ustawienie seedu
         self.seed = seed or self.seed
         np.random.seed(self.seed)
@@ -32,7 +29,7 @@ class cma_es:
         self.logger = CMAESLogger(cma_parameters)
         self.bounds = bounds
 
-    def set_parameters(self, x0 ,parameters: CMAParameters):
+    def set_parameters(self, x0, parameters: CMAParameters):
         self.x0 = x0
         self.dim = len(self.x0)
         self.sigma = parameters.sigma
@@ -55,7 +52,7 @@ class cma_es:
 
             fitness = np.array([func(x) for x in pop])
             idx = np.argsort(fitness)
-            best_idx = idx[:self.mu]
+            best_idx = idx[: self.mu]
             best_d = d_list[best_idx]
             best_fitness = fitness[best_idx]
 
@@ -80,7 +77,7 @@ class cma_es:
 
         return self.m
 
-    def compute_new_center(self, center_inputs, weights = None):
+    def compute_new_center(self, center_inputs, weights=None):
         if isinstance(self.center_strategy, mn.WeightedFitnessCenterStrategy):
             center = self.center_strategy.compute_center(weights, center_inputs)
         else:
@@ -95,7 +92,7 @@ class cma_es:
             x = self.m + self.sigma * d
             if self.bounds is not None:
                 lower, upper = self.bounds
-                x = np.clip(x, lower, upper) 
+                x = np.clip(x, lower, upper)
             d_list.append(d)
             pop.append(x)
         return np.array(pop), np.array(d_list)
@@ -105,7 +102,9 @@ class cma_es:
         D = np.clip(D, 1e-10, None)
         C_inv_sqrt = V @ np.diag(1 / np.sqrt(D)) @ V.T
         # C_inv_sqrt = np.linalg.inv(np.linalg.cholesky(self.C)).T
-        self.p_sigma = (1 - self.c_sigma) * self.p_sigma + np.sqrt(self.c_sigma * (2 - self.c_sigma) * self.mu) * (C_inv_sqrt @ delta)
+        self.p_sigma = (1 - self.c_sigma) * self.p_sigma + np.sqrt(
+            self.c_sigma * (2 - self.c_sigma) * self.mu
+        ) * (C_inv_sqrt @ delta)
 
     def update_sigma(self):
         norm_p_sigma = np.linalg.norm(self.p_sigma)
@@ -115,10 +114,12 @@ class cma_es:
         self.sigma = np.clip(self.sigma, 1e-8, 1e8)
 
     def update_path_c(self, delta):
-        self.p_c = (1.0 - self.c_c) * self.p_c + np.sqrt(self.c_c * (2.0 - self.c_c) * float(self.mu)) * delta
+        self.p_c = (1.0 - self.c_c) * self.p_c + np.sqrt(
+            self.c_c * (2.0 - self.c_c) * float(self.mu)
+        ) * delta
 
     def update_covariance(self, best_d):
         rank_one = self.c_1 * np.outer(self.p_c, self.p_c)
         rank_mu = self.c_mu * np.mean([np.outer(d, d) for d in best_d], axis=0)
         self.C = (1 - self.c_1 - self.c_mu) * self.C + rank_one + rank_mu
-        self.C += np.eye(self.dim) * 1e-8 
+        self.C += np.eye(self.dim) * 1e-8

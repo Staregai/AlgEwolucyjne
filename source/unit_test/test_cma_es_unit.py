@@ -5,6 +5,7 @@ from functions.benchmark import ackley
 import optimizer.center_strategies as mn
 from optimizer.cma_parameters import *
 
+
 # python -m unittest test.testscma_es_.py
 class cma_es_unit_tests(unittest.TestCase):
 
@@ -19,7 +20,7 @@ class cma_es_unit_tests(unittest.TestCase):
         d_mean = np.mean(d_list, axis=0)
         d_std = np.std(d_list, axis=0)
 
-        self.assertTrue(np.all(np.abs(d_mean) < 0.2)) 
+        self.assertTrue(np.all(np.abs(d_mean) < 0.2))
         self.assertTrue(np.all(np.abs(d_std - 1) < 0.2))
 
         p_mean = np.mean(pop, axis=0)
@@ -34,7 +35,7 @@ class cma_es_unit_tests(unittest.TestCase):
     def test_generate_population_second(self):
         dim = 4
         optimizer = cma_es(x0=np.zeros(dim))
-        optimizer.C = np.eye(dim) * 4 
+        optimizer.C = np.eye(dim) * 4
         optimizer.m = [10, 10, 10, 10]
         optimizer.pop_size = 1000
 
@@ -113,7 +114,9 @@ class cma_es_unit_tests(unittest.TestCase):
 
         rank_mu = optimizer.c_mu * np.mean([np.outer(d, d) for d in best_d], axis=0)
 
-        expected_C = (1 - optimizer.c_1 - optimizer.c_mu) * optimizer.C + rank_one + rank_mu
+        expected_C = (
+            (1 - optimizer.c_1 - optimizer.c_mu) * optimizer.C + rank_one + rank_mu
+        )
 
         optimizer.update_covariance(best_d)
 
@@ -129,7 +132,9 @@ class cma_es_unit_tests(unittest.TestCase):
         pop = np.array([[1, 2], [3, 4], [5, 6]])
         weights = np.linspace(len(pop), 1, len(pop))
 
-        parameters = CMAParameters.basic_from_literature(dim = 2, center_strategy=mn.WeightedFitnessCenterStrategy())
+        parameters = CMAParameters.basic_from_literature(
+            dim=2, center_strategy=mn.WeightedFitnessCenterStrategy()
+        )
         cma = cma_es(x0=[0, 0], parameters=parameters)
         center = cma.compute_new_center(pop, weights=weights)
         self.assertTrue(np.allclose(center, np.average(pop, axis=0, weights=weights)))
@@ -139,30 +144,39 @@ class cma_es_unit_tests(unittest.TestCase):
         parameters = CMAParameters.basic_from_literature(
             dim=2, center_strategy=mn.MedianCenterStrategy()
         )
-        cma = cma_es(x0=[0, 0], parameters = parameters)
+        cma = cma_es(x0=[0, 0], parameters=parameters)
         center = cma.compute_new_center(pop)
         self.assertTrue(np.allclose(center, np.median(pop, axis=0)))
 
     def test_trimmed_mean_center(self):
-        pop = np.array([
-        [1, 2],   
-        [3, 4],    
-        [5, 6],    
-        [7, 8],    
-        [9, 10],   
-        [11, 12],  
-        [13, 14],  
-        [15, 16],  
-        [17, 18],  
-        [100, 5]   
-    ])
-        
-        cma = cma_es(x0=[0, 0], parameters=CMAParameters.basic_from_literature(dim=2, center_strategy=mn.TrimmedMeanCenterStrategy()))
+        pop = np.array(
+            [
+                [1, 2],
+                [3, 4],
+                [5, 6],
+                [7, 8],
+                [9, 10],
+                [11, 12],
+                [13, 14],
+                [15, 16],
+                [17, 18],
+                [100, 5],
+            ]
+        )
+
+        cma = cma_es(
+            x0=[0, 0],
+            parameters=CMAParameters.basic_from_literature(
+                dim=2, center_strategy=mn.TrimmedMeanCenterStrategy()
+            ),
+        )
         center = cma.compute_new_center(pop)
         # sortujemy po sumie wartości w każdym wektorze
         sorted_vectors = pop[np.argsort(np.sum(pop, axis=1))]
         trimmed_vectors = sorted_vectors[1:-1]  # po jednym z każdej strony (k=1)
         expected = np.mean(trimmed_vectors, axis=0)
         self.assertTrue(np.allclose(center, expected))
+
+
 if __name__ == "__main__":
     unittest.main()

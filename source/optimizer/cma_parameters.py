@@ -6,10 +6,10 @@ class CMAParameters:
 
     def __init__(
         self,
-        x0 = None,
+        x0=None,
         sigma=0.5,
         max_iter=1000,
-        center_strategy: CenterStrategy  = ArithmeticMeanCenterStrategy(),
+        center_strategy: CenterStrategy = ArithmeticMeanCenterStrategy(),
         seed=44,
         pop_size=None,
         mu=None,
@@ -19,6 +19,7 @@ class CMAParameters:
         c_1=None,
         c_mu=None,
         logging=None,
+        dim=None,
     ):
         self.x0 = x0
         # wariacja
@@ -44,6 +45,8 @@ class CMAParameters:
         self.c_mu = c_mu
         # logowanie
         self.loging = True
+        # dim
+        self.dim = dim
 
     @staticmethod
     def basic(x0, center_strategy=None, seed=44):
@@ -52,15 +55,14 @@ class CMAParameters:
             sigma=0.5,
             max_iter=300,
             center_strategy=center_strategy or ArithmeticMeanCenterStrategy(),
-            seed= 44 ,
+            seed=44,
             pop_size=None,
-            mu=None,  
-            )
+            mu=None,
+        )
 
     @staticmethod
     def basic_from_literature(dim, center_strategy=None, seed=44):
-
-        pop_size = (4 + int(3 * np.log(dim)))
+        pop_size = 4 + int(3 * np.log(dim))
         mu = pop_size // 2
         c_sigma = 0.3
         d_sigma = 1 + 2 * max(0, np.sqrt((mu - 1) / (dim + 1)) - 1) + c_sigma
@@ -74,13 +76,14 @@ class CMAParameters:
         return CMAParameters(
             sigma=0.5,
             mu=mu,
-            pop_size= pop_size,
+            pop_size=pop_size,
             c_sigma=0.3,
             d_sigma=d_sigma,
             c_c=c_c,
             c_1=c_1,
             c_mu=c_mu,
-            max_iter = 1000,
+            max_iter=1000,
             center_strategy=center_strategy or ArithmeticMeanCenterStrategy(),
             seed=seed,
+            dim=dim,
         )

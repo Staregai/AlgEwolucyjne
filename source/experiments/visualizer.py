@@ -57,6 +57,7 @@ def plot_convergence_curves(
         min_fx = min(all_fx)
         if min_fx > 0:
             plt.yscale("log")
+            plt.ylim(max(min_fx, 1e-25), max(all_fx)) 
         else:
             plt.yscale("linear")
             print("Uwaga: Wartości <= 0, wykres na skali liniowej.")
@@ -115,16 +116,15 @@ def plot_convergence_curves(
 
 if __name__ == "__main__":
     functions = [
-        "sphere"
-        # ,
-        # "rosenbrock",
-        # "rastrigin",
-        # "ellipsoid", 
-        # "ackley" "schwefel",
-        # "griewank",
-        # "zakharov",
-        # "michalewicz",
-        # "booth",
+        "sphere",
+        "rosenbrock",
+        "rastrigin",
+        "ellipsoid", 
+        "ackley" "schwefel",
+        "griewank",
+        "zakharov",
+        "michalewicz",
+        "booth"
     ]
 
     for func in functions:
