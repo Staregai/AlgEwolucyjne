@@ -44,8 +44,28 @@ def plot_convergence_curves(
                 min_len = min(len(curve) for curve in all_curves)
                 all_curves = [curve[:min_len] for curve in all_curves]
                 mean_curve = sum(all_curves) / len(all_curves)
+                sorted_curves = sorted(all_curves, key=lambda curve: curve[-1])
+                trimmed_curves = sorted_curves[: int(len(sorted_curves) * 0.9)]
+                mean_curve = sum(trimmed_curves) / len(trimmed_curves)
+
                 iteration_values = df["iteration"].values[:min_len]
                 plt.plot(iteration_values, mean_curve, label=strategy)
+
+            seed_to_plot = 42
+            seed_file = f"{curves_dir}/{func_name}_{strategy}_dim{dim}_seed{seed_to_plot}.csv"
+            if os.path.exists(seed_file):
+                df_seed = pd.read_csv(seed_file)
+                if "fx" in df_seed.columns and len(df_seed["fx"]) > 0:
+                    plt.plot(
+                        df_seed["iteration"],
+                        df_seed["fx"],
+                        linestyle="--",
+                        alpha=0.6,
+                        label=f"{strategy} (seed={seed_to_plot})",
+                    )
+            else: 
+                print("brak plikow")
+
         if not any_curve:
             print(f"Brak danych do narysowania wykresu dla dim={dim}!")
             plt.close()
@@ -70,6 +90,8 @@ def plot_convergence_curves(
         plt.savefig(plot_path)
         print(f"Saved plot to {plot_path}")
         plt.close()
+
+
 
     # jeden wykres 4 subploty
     fig, axs = plt.subplots(2, 2, figsize=(14, 10))
@@ -120,7 +142,8 @@ if __name__ == "__main__":
         "rosenbrock",
         "rastrigin",
         "ellipsoid", 
-        "ackley" "schwefel",
+        "ackley",
+        "schwefel",
         "griewank",
         "zakharov",
         "michalewicz",

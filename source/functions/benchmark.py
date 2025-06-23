@@ -51,7 +51,7 @@ def booth(x):
 
 
 benchmark_functions = {
-    # "sphere": sphere,
+    "sphere": sphere,
     "rastrigin": rastrigin,
     "rosenbrock": rosenbrock,
     "ellipsoid": ellipsoid,
