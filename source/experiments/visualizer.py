@@ -30,6 +30,9 @@ def plot_convergence_curves(
         any_curve = False
         for strategy in strategies:
             all_curves = []
+            if (func_name in ["michalewicz", "booth"] and dim > 2):
+                continue
+            
             files = glob.glob(f"{curves_dir}/{func_name}_{strategy}_dim{dim}_seed*.csv")
             if not files:
                 print(
