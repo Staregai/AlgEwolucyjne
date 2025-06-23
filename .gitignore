@@ -1,5 +1,3 @@
 __pycache__
 outcmaes
-results/
-!results/final/
-!results/final/**
+venv/

@@ -54,26 +54,6 @@ def plot_convergence_curves(
                 iteration_values = df["iteration"].values[:min_len]
                 plt.plot(iteration_values, mean_curve, label=strategy)
 
-            seed_to_plot = 42
-            seed_file = f"{curves_dir}/{func_name}_{strategy}_dim{dim}_seed{seed_to_plot}.csv"
-            if os.path.exists(seed_file):
-                df_seed = pd.read_csv(seed_file)
-                if "fx" in df_seed.columns and len(df_seed["fx"]) > 0:
-                    plt.plot(
-                        df_seed["iteration"],
-                        df_seed["fx"],
-                        linestyle="--",
-                        alpha=0.6,
-                        label=f"{strategy} (seed={seed_to_plot})",
-                    )
-            else: 
-                print("brak plikow")
-
-        if not any_curve:
-            print(f"Brak danych do narysowania wykresu dla dim={dim}!")
-            plt.close()
-            continue
-
         all_fx = []
         for line in plt.gca().get_lines():
             all_fx.extend(line.get_ydata())
