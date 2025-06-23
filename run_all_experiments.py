@@ -15,7 +15,7 @@ if __name__ == "__main__":
 
     if len(sys.argv) < 2:
         print("Usage: python run_all.py [flags]")
-        print("Flags: e = experiments, w = wilcoxon, v = visualization")
+        print("Flags: e = experiments, w = wilcoxon, v = visualization", 's = summary stats')
         sys.exit(1)
 
     flags = sys.argv[1]
@@ -33,3 +33,6 @@ if __name__ == "__main__":
 
     if "v" in flags:
         run_command("python -m experiments.visualizer", "Generating plots")
+
+    if "s" in flags:
+        run_command("python -m experiments.calculate_stat", "Generating summary stats")

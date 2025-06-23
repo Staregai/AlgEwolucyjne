@@ -1,12 +1,9 @@
 import pandas as pd
 
-# Wczytaj plik CSV
 df = pd.read_csv("results/performance_results.csv")
 
-# Grupuj po funkcji, strategii i wymiarze
 grouped = df.groupby(["function", "strategy", "dim"])
 
-# Przygotuj dane do nowego DataFrame
 rows = []
 for (func, strat, dim), group in grouped:
     mean_fx = group["fx"].mean()
