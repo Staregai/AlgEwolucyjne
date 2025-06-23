@@ -84,9 +84,9 @@ benchmark_known_min = {
     "ackley": 0.0,
     "schwefel": 420.9687,
     "griewank": 0.0,
-    "zakharov": 0.0
-    # "michalewicz": [2.20, 1.57],  
-    # "booth": [1.0, 3.0],  
+    "zakharov": 0.0,
+    "michalewicz": [2.20, 1.57],  
+    "booth": [1.0, 3.0]
 }
 
 benchmark_known_min_values = {

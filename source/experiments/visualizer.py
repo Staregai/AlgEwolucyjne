@@ -30,8 +30,6 @@ def plot_convergence_curves(
         any_curve = False
         for strategy in strategies:
             all_curves = []
-            if (func_name in ["michalewicz", "booth"] and dim > 2):
-                continue
             
             files = glob.glob(f"{curves_dir}/{func_name}_{strategy}_dim{dim}_seed*.csv")
             if not files:
@@ -94,7 +92,8 @@ def plot_convergence_curves(
                 min_len = min(len(curve) for curve in all_curves)
                 all_curves = [curve[:min_len] for curve in all_curves]
                 mean_curve = sum(all_curves) / len(all_curves)
-                ax.plot(range(min_len), mean_curve, label=strategy)
+                iteration_values = df["iteration"].values[:min_len]
+                ax.plot(iteration_values, mean_curve, label=strategy)
         if any_curve:
             all_fx = []
             for line in ax.get_lines():
